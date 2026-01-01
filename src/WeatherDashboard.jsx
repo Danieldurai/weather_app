@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { ViewContext, CityContext } from "./Context";
 import {
   Search,
   MapPin,
@@ -25,9 +26,13 @@ import {
 } from "recharts";
 
 const WeatherDashboard = () => {
+  const {setView} = useContext(ViewContext)
+  const {contextCity} = useContext(CityContext)
+
+
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [city, setCity] = useState("Chennai");
+  const [city, setCity] = useState(()=>contextCity || 'Chennai');
   const [searchInput, setSearchInput] = useState("");
   const [error, setError] = useState("");
   const [animate, setAnimate] = useState(false);
@@ -37,6 +42,8 @@ const WeatherDashboard = () => {
   const debounceTimer = useRef(null);
 
   const API_KEY = "10b7d7207615b10078fbfe572427a8e6";
+
+ 
 
   // Fetch city suggestions function
   const fetchCitySuggestions = async (query) => {
@@ -282,9 +289,56 @@ const WeatherDashboard = () => {
       `}</style>
 
       <div className="w-full">
+      <div className="absolute top-10 left-8 flex items-center gap-4">
+  {/* Text Logo */}
+  <h1 className="text-4xl font-extralight text-white tracking-tighter select-none">
+    WORLD<span className="font-bold text-[#00f2ff]">Weather</span>
+  </h1>
+
+  {/* 3D Animated Globe Container */}
+  <div onClick={() => setView('globe')} className="group relative flex items-center justify-center cursor-pointer">
+    
+    {/* Tooltip - Appears on Group Hover */}
+    <span className="absolute bottom-full mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none w-max px-2.5 py-1 bg-black/80 text-[#00f2ff] text-[10px] uppercase tracking-widest font-bold rounded border border-[#00f2ff]/50 backdrop-blur-md">
+      Globe View
+    </span>
+
+    {/* The Pulsing Wrapper */}
+    {/* Base: pulse-slow | Hover: pulse-fast & scale-up */}
+    <div className="relative w-10 h-10 transition-transform duration-500 group-hover:scale-125
+      animate-[pulse_2s_ease-in-out_infinite] 
+      group-hover:animate-[pulse_0.8s_ease-in-out_infinite]">
+      
+      {/* 3D Lighting Overlay (The "Glass" Sphere Look) */}
+      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(0,242,255,0.6)_0%,transparent_70%)] z-10" />
+      
+      <svg 
+        viewBox="0 0 24 24" 
+        className="w-full h-full drop-shadow-[0_0_15px_rgba(0,242,255,0.7)] group-hover:drop-shadow-[0_0_25px_rgba(0,242,255,0.9)] transition-all duration-300"
+        fill="none" 
+        stroke="#00f2ff" 
+        strokeWidth="1.5"
+      >
+        {/* Atmosphere / Outer Border */}
+        <circle cx="12" cy="12" r="10" className="opacity-70" />
+        
+        {/* Latitudes */}
+        <path d="M2 12h20" className="opacity-40" />
+        <path d="M5 8h14" className="opacity-20" />
+        <path d="M5 16h14" className="opacity-20" />
+
+        {/* 3D Spinning Meridians */}
+        <g className="animate-[spin-y_3s_linear_infinite] origin-center">
+          <ellipse cx="12" cy="12" rx="4" ry="10" />
+          <ellipse cx="12" cy="12" rx="9" ry="10" className="opacity-30" />
+        </g>
+      </svg>
+    </div>
+  </div>
+</div>
         {/* Search Bar */}
         <div className={`mb-8 ${animate ? "animate-fade-in" : ""}`}>
-          <div className="relative flex gap-2 max-w-3xl mx-auto">
+          <div className="relative flex gap-2 max-w-3xl ml-auto">
             {/* <div className="relative flex-1">
               <input
                 type="text"
